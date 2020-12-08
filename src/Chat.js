@@ -1,10 +1,25 @@
-import { Avatar, IconButton } from '@material-ui/core'
-import { SearchOutlined, AttachFile, MoreVert, InsertEmoticon } from '@material-ui/icons'
-import MicIcon from "@material-ui/icons/Mic"
-import React from 'react'
-import "./Chat.css"
+import { Avatar, IconButton } from '@material-ui/core';
+import { SearchOutlined, AttachFile, MoreVert, InsertEmoticon } from '@material-ui/icons';
+import MicIcon from "@material-ui/icons/Mic";
+import React, { useState } from 'react';
+import "./Chat.css";
+import axios from './axios';
 
-function Chat() {
+function Chat({messages}) {
+    const [input, setInput] = useState("");
+   
+    const sendMessage = async (e) => {
+        e.preventDefault();
+       
+       await axios.post('messages/new', {
+            "message": input,
+            "name": "bob marley",
+             "timestamp": "thefuture",
+             "received": false
+        }); 
+        setInput('');
+    };
+
     return (
         <div className = "chat">
            <div className = "chat__header">
@@ -26,6 +41,21 @@ function Chat() {
                </div>
            </div>
            <div className ="chat__body">
+               {messages.map((message) => (
+                   <p 
+                   className ={`chat__message ${message.recieved && "chat__reciever"}`}
+                   >
+                   <span className = "chat__name">{message.name}
+                   </span>
+                   {message.message}
+                   
+                   <span className = "chat__timestamp">
+                       {message.timestamp}
+                    </span>
+                    </p>
+
+               ))}
+              
                <p className = "chat__message">
                    <span className = "chat__name">Damian
                    </span>
@@ -71,11 +101,13 @@ function Chat() {
                <InsertEmoticon />
                <form>
                    <input 
+                   value = {input} 
+                   onChange = {e => setInput(e.target.value)}
                    placeholder ="type a message"
                    type = "text"
                    />
                    <button 
-                   type = "submit">
+                   onClick = {sendMessage} type = "submit">
                        Send a message
                    </button>
                </form>
